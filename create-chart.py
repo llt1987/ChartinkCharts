@@ -36,4 +36,4 @@ plt.savefig(filename)  # Save as PNG file
 
 
 # Show the plot
-plt.show()
+# plt.show()
