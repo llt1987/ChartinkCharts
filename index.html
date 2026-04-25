@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ChartinkCharts Dashboard</title>
+  <title>Accumulation Distribution Dashboard</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,42 +16,23 @@
       padding: 20px;
       text-align: center;
     }
-    header h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-    nav {
-      background: #34495e;
-      padding: 10px;
-      text-align: center;
-    }
-    nav a {
-      color: #fff;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+    ol {
+      list-style: decimal inside;
       padding: 20px;
     }
-    .chart-card {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      margin: 15px;
-      padding: 15px;
-      width: 420px;
-      text-align: center;
+    li {
+      margin-bottom: 20px;
     }
-    .chart-card img {
-      max-width: 100%;
-      border-radius: 4px;
+    .thumbnail {
+      max-width: 300px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .thumbnail:hover {
+      transform: scale(1.05);
+      border-color: #2c3e50;
     }
     footer {
       background: #2c3e50;
@@ -64,35 +45,33 @@
 </head>
 <body>
   <header>
-    <h1>ChartinkCharts Dashboard</h1>
-    <p>Visualizing Smallcap & Midcap Sector Trends</p>
+    <h1>Accumulation Distribution Dashboard</h1>
+    <p>Click thumbnails to view full charts</p>
   </header>
 
-  <nav>
-    <a href="#smallcap">Smallcap</a>
-    <a href="#midcap">Midcap</a>
-    <a href="#reports">Reports</a>
-  </nav>
-
-  <div class="container">
-    <div class="chart-card" id="smallcap">
-      <h2>Smallcap Accumulation</h2>
-      <img src="Smallcap_Sector_Accumulation_Distribution.png" alt="Smallcap Chart">
-    </div>
-
-    <div class="chart-card" id="midcap">
-      <h2>Midcap Accumulation</h2>
-      <img src="Midcap_Sector_Accumulation_Distribution.png" alt="Midcap Chart">
-    </div>
-
-    <div class="chart-card" id="reports">
-      <h2>Sector Distribution</h2>
-      <img src="Smallcap_vs_Midcap_Accumulation.png" alt="Smallcap Vs Midcap Chart">
-    </div>
-  </div>
+  <ol>
+    <li>
+      <strong>Smallcap Accumulation</strong><br>
+      <a href="Smallcap_Sector_Accumulation_Distribution.png" target="_blank">
+        <img src="Smallcap_Sector_Accumulation_Distribution.png" alt="Smallcap Chart" class="thumbnail">
+      </a>
+    </li>
+    <li>
+      <strong>Midcap Accumulation</strong><br>
+      <a href="Midcap_Sector_Accumulation_Distribution.png" target="_blank">
+        <img src="Midcap_Sector_Accumulation_Distribution.png" alt="Midcap Chart" class="thumbnail">
+      </a>
+    </li>
+    <li>
+      <strong>Sector Distribution</strong><br>
+      <a href="Smallcap_vs_Midcap_Accumulation.png" target="_blank">
+        <img src="Smallcap_vs_Midcap_Accumulation.png" alt="Smallcap vs Midcap Chart" class="thumbnail">
+      </a>
+    </li>
+  </ol>
 
   <footer>
-    <p>&copy; 2026 ChartinkCharts | Built with Pandas & Matplotlib</p>
+    <p>&copy; Copyright @LT 2026 | Built with Pandas & Matplotlib</p>
   </footer>
 </body>
 </html>
