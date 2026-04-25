@@ -31,7 +31,7 @@ timestamp1 = datetime.now().strftime("%Y%m%d_%H%M%S")
 timestamp = datetime.now().strftime("%Y%m%d")
 print("Current Time =", timestamp)
 # Save the plot to a file with timestamp appended
-filename = 'Smallcap_Accumulation_data_'+ (str(timestamp1)) +'.png'
+filename = 'Smallcap_Accumulation_data.png'
 plt.savefig(filename)  # Save as PNG file
 
 
