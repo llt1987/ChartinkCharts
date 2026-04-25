@@ -1,39 +1,30 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import date
-from datetime import datetime
 
-# Read the Excel file into a pandas DataFrame
-df = pd.read_excel('Smallcap_Vol_shockers_above_30WMA.xls')
+# Read your Excel file
+df = pd.read_excel("Smallcap_Vol_shockers_above_30WMA.xls")
 
-md = pd.read_excel('Midcap_Vol_shockers_above_30WMA.xls')
-# Aggregate column data
-agg_data = df.groupby('date')['date'].count()  # Replace 'group_column' and 'value_column' with your column names
-
-# Aggregate column data
-agg_data = md.groupby('date')['date'].count()  # Replace 'group_column' and 'value_column' with your column names
-
-# Create bar chart
-agg_data.plot(kind='bar')
+# Ensure 'date' column is parsed as datetime
+#df['date'] = pd.to_datetime(df['date'], dayfirst=True)
+df['date'] = pd.to_datetime(df['date'], format="%d-%m-%Y").dt.date
 
 
-# Add labels and title
-plt.xlabel('Date')
-plt.ylabel('Number of Count')
-plt.title('Smallcap Accumulation Data')
+# Count occurrences of each sector per date
+sector_counts = df.groupby(['date', 'sector']).size().unstack(fill_value=0)
 
-# Adjust subplot parameters
-plt.subplots_adjust(left=0.08, right=0.9, top=0.75, bottom=0.3)  # Adjust as needed
+# Plot stacked bar chart
+sector_counts.plot(kind='bar', stacked=True, figsize=(12, 6))
 
+# Labels and title
+plt.xlabel("Date")
+plt.ylabel("Count of Symbols")
+plt.title("Accumulation Distribution by Date (Smallcap)")
+plt.legend(title="Sector", bbox_to_anchor=(1.05, 1), loc='upper left')
 
-# Generate timestamp
-timestamp1 = datetime.now().strftime("%Y%m%d_%H%M%S")
-timestamp = datetime.now().strftime("%Y%m%d")
-print("Current Time =", timestamp)
-# Save the plot to a file with timestamp appended
-filename = 'Smallcap_Accumulation_data.png'
-plt.savefig(filename)  # Save as PNG file
+# Adjust layout
+plt.tight_layout()
 
+# Save chart
+plt.savefig("Smallcap_Sector_Accumulation_Distribution.png")
+print("Report saved as Smallcap_Sector_Accumulation_Distribution.png")
 
-# Show the plot
-# plt.show()
