@@ -3,51 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MarketPulse • Live Stock Analysis with Twelve Data WebSocket</title>
+    <title>MarketPulse • Live Indian Markets</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
+       
         body {
             font-family: 'Inter', system_ui, sans-serif;
         }
-        
+       
         .stock-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+       
         .stock-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
-        
+       
         .price-up { color: #22c55e; animation: priceUp 0.6s ease; }
         .price-down { color: #ef4444; animation: priceDown 0.6s ease; }
-        
+       
         @keyframes priceUp { 0% { transform: scale(1.08); } 100% { transform: scale(1); } }
         @keyframes priceDown { 0% { transform: scale(0.92); } 100% { transform: scale(1); } }
-        
+       
         .live-dot { animation: pulse 2s infinite; }
-        .ticker-content { display: inline-block; animation: ticker-slide 35s linear infinite; }
-        
+        .ticker-content { display: inline-block; animation: ticker-slide 40s linear infinite; }
+       
         @keyframes ticker-slide {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-        
+       
         .tradingview-container {
             height: 420px;
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid #27272a;
-        }
-        
-        .ws-status {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 9999px;
         }
     </style>
 </head>
@@ -60,42 +54,33 @@
                     <div class="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">LT</div>
                     <span class="font-bold text-2xl tracking-tighter">ChartinkCharts</span>
                 </div>
-                
+               
                 <div class="hidden md:flex items-center gap-6 text-sm font-medium">
                     <a href="#" class="text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1">
-                        <i class="fas fa-chart-line"></i> Markets
+                        <i class="fas fa-chart-line"></i> NSE Markets
                     </a>
-                    <a href="#" class="hover:text-zinc-300 transition-colors">Portfolio</a>
                 </div>
             </div>
-            
+           
             <div class="flex items-center gap-4">
                 <div class="relative">
-                    <input type="text" id="searchInput" 
+                    <input type="text" id="searchInput"
                            class="bg-zinc-800 border border-zinc-700 rounded-2xl py-2.5 px-5 pl-11 w-80 text-sm focus:outline-none focus:border-emerald-500"
-                           placeholder="Search symbol (e.g. RELIANCE, AAPL, NIFTY)">
+                           placeholder="Search NSE symbol (e.g. RELIANCE, SBIN, NIFTY)">
                     <i class="fas fa-search absolute left-4 top-3 text-zinc-500"></i>
                 </div>
-                
+               
                 <div id="apiStatus" class="flex items-center gap-2 bg-zinc-800 rounded-2xl px-4 py-2 text-xs">
-                    <div class="w-2 h-2 bg-yellow-400 rounded-full live-dot"></div>
-                    <span>Twelve Data WS: Ready</span>
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full live-dot"></div>
+                    <span>Yahoo Finance • Live</span>
                 </div>
-                
+               
                 <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center hover:bg-zinc-800 rounded-2xl transition-colors">
                     <i id="themeIcon" class="fas fa-moon text-xl"></i>
                 </button>
-                
-                <div class="flex items-center gap-3 pl-4 border-l border-zinc-800">
-                    <div class="text-right text-sm">
-                        <div class="font-medium">Lalit Tomar</div>
-                        <div class="text-xs text-zinc-500">Delhi, India</div>
-                    </div>
-                    <div class="w-9 h-9 bg-zinc-700 rounded-2xl flex items-center justify-center text-lg">👨‍💼</div>
-                </div>
             </div>
         </div>
-        
+       
         <!-- Live Ticker -->
         <div class="bg-zinc-900 border-t border-zinc-800 py-2 text-xs overflow-hidden">
             <div class="max-w-7xl mx-auto px-6 ticker">
@@ -105,25 +90,25 @@
     </nav>
 
     <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Header with Title + Refresh + New Link -->
         <div class="flex justify-between items-center mb-10">
             <div>
-                <h1 class="text-4xl font-bold tracking-tighter mb-1">Live Market Overview <span class="text-xs bg-emerald-900 text-emerald-400 px-2 py-1 rounded-full">WebSocket Enabled</span></h1>
-                <p class="text-zinc-400 flex items-center gap-2" id="currentTime">
-                    Loading...
-                </p>
+                <h1 class="text-4xl font-bold tracking-tighter mb-1">Live Indian Market Overview</h1>
+                <p class="text-zinc-400" id="currentTime">Loading...</p>
             </div>
             
             <div class="flex items-center gap-4">
-                <input type="text" id="twelveDataKeyInput" placeholder="Paste Twelve Data API key" 
-                       class="bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-3 text-sm w-80 focus:outline-none focus:border-emerald-500">
-                <button onclick="saveApiKey()" 
-                        class="bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-3xl text-sm font-medium transition-colors">
-                    Save & Connect WS
-                </button>
+                <!-- Refresh Button (moved here) -->
                 <button onclick="manualRefresh()" 
                         class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-3xl text-sm font-medium">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
+                
+                <!-- New Table / Link to accumulation.html -->
+                <a href="accumulation.html" 
+                   class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-3xl text-sm font-medium text-white transition-colors">
+                    <i class="fas fa-table"></i> Accumulation
+                </a>
             </div>
         </div>
 
@@ -139,45 +124,39 @@
                         <div id="mainPriceDisplay" class="text-4xl font-mono font-semibold">—</div>
                         <div id="mainChangeDisplay" class="text-2xl font-medium">—</div>
                     </div>
-                    
-                    <select id="symbolSelect" onchange="switchSymbol(this.value)" 
+                   
+                    <select id="symbolSelect" onchange="switchSymbol(this.value)"
                             class="bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-3 text-sm">
                         <option value="NIFTY">NIFTY 50</option>
                         <option value="BANKNIFTY">BANK NIFTY</option>
+                        <option value="SENSEX">SENSEX</option>
                         <option value="RELIANCE">Reliance</option>
-                        <option value="TCS">TCS</option>
+                        <option value="SBIN">SBIN</option>
                         <option value="HDFCBANK">HDFC Bank</option>
+                        <option value="TCS">TCS</option>
                         <option value="INFY">Infosys</option>
-                        <option value="AAPL">Apple</option>
-                        <option value="TSLA">Tesla</option>
+                        <option value="ICICIBANK">ICICI Bank</option>
                     </select>
                 </div>
-                
+               
                 <div class="tradingview-container" id="tv-chart"></div>
-                
-                <div class="grid grid-cols-4 gap-6 mt-8 text-sm">
-                    <div><span class="text-zinc-400 block">Open</span><span id="openPrice" class="font-mono font-semibold">—</span></div>
-                    <div><span class="text-zinc-400 block">High</span><span id="highPrice" class="font-mono font-semibold text-emerald-400">—</span></div>
-                    <div><span class="text-zinc-400 block">Low</span><span id="lowPrice" class="font-mono font-semibold text-red-400">—</span></div>
-                    <div><span class="text-zinc-400 block">Prev Close</span><span id="prevClose" class="font-mono font-semibold">—</span></div>
-                </div>
             </div>
 
             <!-- Sidebar -->
             <div class="lg:col-span-4 space-y-8">
                 <div class="bg-zinc-900 rounded-3xl p-7">
                     <h3 class="font-semibold text-lg mb-6 flex items-center gap-2">
-                        <i class="fas fa-arrow-trend-up text-emerald-400"></i> Live Movers
+                        <i class="fas fa-arrow-trend-up text-emerald-400"></i> Top Movers
                     </h3>
                     <div id="moversList" class="space-y-6"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Watchlist with WebSocket updates -->
+        <!-- Watchlist -->
         <div class="mt-16">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-semibold">Watchlist <span id="wsStatus" class="text-xs bg-emerald-900 text-emerald-400 px-3 py-1 rounded-full ml-3">WebSocket Connected</span></h2>
+                <h2 class="text-2xl font-semibold">Watchlist</h2>
                 <button onclick="addToWatchlist()" 
                         class="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-medium">
                     <i class="fas fa-plus"></i> Add Symbol
@@ -188,33 +167,27 @@
     </div>
 
     <footer class="bg-zinc-950 border-t border-zinc-800 py-12 mt-20 text-center text-xs text-zinc-500">
-        <p>MarketPulse • TradingView + Twelve Data REST + Real-time WebSocket</p>
-        <p class="mt-1">Copyright @LT 2026 </p>
+        <p>MarketPulse • TradingView Charts + Yahoo Finance Live Ticker (Free)</p>
+        <p class="mt-1">Copyright © LT 2026 • Delhi, India</p>
     </footer>
 
     <script>
-        // ================== CONFIG ==================
-        let TWELVE_DATA_API_KEY = localStorage.getItem('twelveDataKey') || '';
-        let ws = null;
-        let subscribedSymbols = new Set();
-        let priceCache = {}; // symbol -> latest quote data
-
-        const watchlistSymbols = [
-            "AAPL", "TSLA", "NVDA", "RELIANCE", "TCS", "HDFCBANK", "INFY"
-        ];
-
+        let priceCache = {};
+        let watchlistSymbols = ["RELIANCE", "SBIN", "HDFCBANK", "TCS", "INFY", "ICICIBANK", "BHARTIARTL"];
         let currentMainSymbol = "NIFTY";
+        let tickerInterval = null;
 
         // ================== TRADINGVIEW ==================
         function initTradingView(symbol) {
             const container = document.getElementById('tv-chart');
             container.innerHTML = '';
-            
             currentMainSymbol = symbol;
-            
-            const tvSymbol = ["NIFTY", "BANKNIFTY"].includes(symbol) ? `NSE:${symbol}` : 
-                            (["RELIANCE","TCS","HDFCBANK","INFY"].includes(symbol) ? `NSE:${symbol}` : symbol);
-            
+
+            let tvSymbol = `NSE:${symbol}`;
+            if (symbol === "NIFTY") tvSymbol = "NSE:NIFTY";
+            else if (symbol === "BANKNIFTY") tvSymbol = "NSE:BANKNIFTY";
+            else if (symbol === "SENSEX") tvSymbol = "BSE:SENSEX";
+
             new TradingView.widget({
                 "container_id": "tv-chart",
                 "width": "100%",
@@ -232,151 +205,81 @@
             });
         }
 
-        // ================== TWELVE DATA REST (fallback) ==================
+        // ================== YAHOO FINANCE ==================
         async function fetchQuote(symbol) {
-            if (!TWELVE_DATA_API_KEY) return null;
             try {
-                const res = await fetch(`https://api.twelvedata.com/quote?symbol=\( {encodeURIComponent(symbol)}&apikey= \){TWELVE_DATA_API_KEY}`);
+                let ySymbol = symbol === "NIFTY" ? "^NSEI" : 
+                             symbol === "BANKNIFTY" ? "^NSEBANK" : 
+                             symbol === "SENSEX" ? "^BSESN" : `${symbol}.NS`;
+
+                const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ySymbol}?interval=1m&range=1d`);
                 if (!res.ok) return null;
+
                 const data = await res.json();
+                const result = data.chart.result[0];
+                if (!result) return null;
+
+                const meta = result.meta;
+                const price = meta.regularMarketPrice || meta.previousClose || 0;
+                const prevClose = meta.previousClose || price;
+                const change = price - prevClose;
+                const percent = prevClose ? (change / prevClose) * 100 : 0;
+
                 return {
-                    symbol: data.symbol || symbol,
-                    price: parseFloat(data.close) || 0,
-                    change: parseFloat(data.change) || 0,
-                    percent: parseFloat(data.percent_change) || 0,
-                    open: parseFloat(data.open),
-                    high: parseFloat(data.high),
-                    low: parseFloat(data.low),
-                    prevClose: parseFloat(data.previous_close)
+                    price: parseFloat(price.toFixed(2)),
+                    percent: parseFloat(percent.toFixed(2))
                 };
             } catch (e) {
-                console.error("REST fetch failed for", symbol);
+                console.error("Yahoo fetch failed for", symbol);
                 return null;
             }
         }
 
-        // ================== WEB SOCKET ==================
-        function connectWebSocket() {
-            if (ws) ws.close();
-            
-            if (!TWELVE_DATA_API_KEY) {
-                console.warn("No API key - WebSocket not started");
-                return;
-            }
-            
-            const wsUrl = `wss://ws.twelvedata.com/v1/quotes/price?apikey=${TWELVE_DATA_API_KEY}`;
-            ws = new WebSocket(wsUrl);
-            
-            ws.onopen = () => {
-                console.log("%c✅ Twelve Data WebSocket Connected", "color:#22c55e");
-                document.getElementById('wsStatus').textContent = "WebSocket Live";
-                document.getElementById('wsStatus').className = "text-xs bg-emerald-900 text-emerald-400 px-3 py-1 rounded-full ml-3";
-                
-                // Subscribe to all watchlist + main symbol
-                const symbolsToSubscribe = [...new Set([...watchlistSymbols, currentMainSymbol])];
-                subscribeToSymbols(symbolsToSubscribe);
-            };
-            
-            ws.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    
-                    if (data.event === "price") {
-                        const sym = data.symbol;
-                        const priceData = {
-                            price: parseFloat(data.price),
-                            change: parseFloat(data.change) || 0,
-                            percent: parseFloat(data.percent_change) || 0,
-                            timestamp: data.timestamp
-                        };
-                        
-                        priceCache[sym] = { ...priceCache[sym], ...priceData };
-                        
-                        // Update UI in real-time
-                        updatePriceInUI(sym, priceData);
-                    } 
-                    else if (data.event === "subscribe-status") {
-                        console.log("Subscription status:", data);
-                    }
-                } catch (e) {
-                    console.error("WS message parse error", e);
+        // ================== LIVE TICKER ==================
+        async function updateLiveTicker() {
+            const tickerEl = document.getElementById('liveTicker');
+            let html = '';
+
+            for (let sym of ["NIFTY", "BANKNIFTY", "RELIANCE", "SBIN", "HDFCBANK", "TCS"]) {
+                const quote = await fetchQuote(sym);
+                if (quote) {
+                    priceCache[sym] = quote;
+                    const isUp = quote.percent >= 0;
+                    html += `<span class="mr-16">${sym} ₹${quote.price} <span class="${isUp ? 'text-emerald-400' : 'text-red-400'}">${isUp ? '+' : ''}${quote.percent}%</span></span>`;
+                } else {
+                    html += `<span class="mr-16">${sym} —</span>`;
                 }
-            };
-            
-            ws.onclose = () => {
-                console.log("%cWebSocket closed. Reconnecting in 5s...", "color:#f59e0b");
-                setTimeout(connectWebSocket, 5000);
-            };
-            
-            ws.onerror = (err) => {
-                console.error("WebSocket error", err);
-            };
+            }
+            tickerEl.innerHTML = html + html;
         }
 
-        function subscribeToSymbols(symbols) {
-            if (!ws || ws.readyState !== WebSocket.OPEN) return;
-            
-            const message = {
-                action: "subscribe",
-                params: {
-                    symbols: symbols.join(",")
-                }
-            };
-            
-            ws.send(JSON.stringify(message));
-            symbols.forEach(s => subscribedSymbols.add(s));
-        }
-
-        function updatePriceInUI(symbol, priceData) {
-            // Update watchlist cards
-            const cards = document.querySelectorAll('#watchlistGrid > div');
-            cards.forEach(card => {
-                if (card.textContent.includes(symbol)) {
-                    const priceEl = card.querySelector('.font-mono.text-2xl');
-                    const changeEl = card.querySelector('.price-up, .price-down');
-                    
-                    if (priceEl) priceEl.textContent = `₹${priceData.price.toFixed(2)}`;
-                    if (changeEl && priceData.percent !== undefined) {
-                        const isUp = priceData.percent >= 0;
-                        changeEl.className = `text-sm font-medium ${isUp ? 'price-up' : 'price-down'}`;
-                        changeEl.textContent = `\( {isUp ? '+' : ''} \){priceData.percent.toFixed(2)}%`;
-                    }
-                }
-            });
-            
-            // Update main display if matches
-            if (symbol === currentMainSymbol) {
-                document.getElementById('mainPriceDisplay').textContent = priceData.price.toFixed(2);
-                const changeEl = document.getElementById('mainChangeDisplay');
-                changeEl.textContent = `\( {priceData.percent >= 0 ? '+' : ''} \){priceData.percent.toFixed(2)}%`;
-                changeEl.className = `text-2xl font-medium ${priceData.percent >= 0 ? 'price-up' : 'price-down'}`;
-            }
-            
-            // Update live ticker occasionally
-            if (Math.random() > 0.7) updateLiveTicker();
+        function startLiveTicker() {
+            updateLiveTicker();
+            if (tickerInterval) clearInterval(tickerInterval);
+            tickerInterval = setInterval(updateLiveTicker, 8000);
         }
 
         // ================== RENDER FUNCTIONS ==================
         async function renderWatchlist() {
             const container = document.getElementById('watchlistGrid');
             container.innerHTML = '';
-            
+           
             for (const sym of watchlistSymbols) {
                 const cached = priceCache[sym];
                 const isUp = cached && cached.percent >= 0;
-                
+               
                 const div = document.createElement('div');
                 div.className = `bg-zinc-900 rounded-3xl p-6 stock-card`;
                 div.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
                             <div class="font-bold text-lg">${sym}</div>
-                            <div class="text-xs text-emerald-400">Twelve Data • Live WS</div>
+                            <div class="text-xs text-emerald-400">Yahoo Finance</div>
                         </div>
                         <div class="text-right">
-                            <div class="font-mono text-2xl font-semibold">${cached ? '₹' + cached.price.toFixed(2) : '—'}</div>
+                            <div class="font-mono text-2xl font-semibold">${cached ? '₹' + cached.price : '—'}</div>
                             <div class="${isUp ? 'price-up' : 'price-down'} text-sm font-medium">
-                                ${cached ? (isUp ? '+' : '') + cached.percent.toFixed(2) + '%' : '—'}
+                                ${cached ? (isUp ? '+' : '') + cached.percent + '%' : '—'}
                             </div>
                         </div>
                     </div>
@@ -388,83 +291,55 @@
         async function renderMovers() {
             const container = document.getElementById('moversList');
             container.innerHTML = '';
-            
-            const samples = ["AAPL", "TSLA", "RELIANCE"];
+            const samples = ["RELIANCE", "SBIN", "HDFCBANK"];
             for (const sym of samples) {
                 const cached = priceCache[sym] || await fetchQuote(sym);
                 if (!cached) continue;
-                
                 const isUp = cached.percent >= 0;
                 const el = document.createElement('div');
-                el.className = 'flex justify-between items-center stock-card';
+                el.className = 'flex justify-between items-center stock-card py-3';
                 el.innerHTML = `
                     <div class="font-semibold">${sym}</div>
                     <div class="text-right">
-                        <div class="font-mono">₹${cached.price.toFixed(2)}</div>
-                        <div class="\( {isUp ? 'text-emerald-400' : 'text-red-400'} text-sm"> \){isUp ? '+' : ''}${cached.percent.toFixed(2)}%</div>
+                        <div class="font-mono">₹${cached.price}</div>
+                        <div class="${isUp ? 'text-emerald-400' : 'text-red-400'} text-sm">
+                            ${isUp ? '+' : ''}${cached.percent}%
+                        </div>
                     </div>
                 `;
                 container.appendChild(el);
             }
         }
 
-      function renderIndices() {
+        function renderIndices() {
             const container = document.getElementById('indicesGrid');
             container.innerHTML = `
                 <div class="bg-zinc-900 rounded-3xl p-6 stock-card">
                     <div class="font-medium">NIFTY 50</div>
-                    <div id="niftyPrice" class="font-mono text-3xl mt-4 text-emerald-400">23,845</div>
-                    <div class="text-emerald-400 mt-2">+0.79%</div>
+                    <div class="font-mono text-3xl mt-4 text-emerald-400">—</div>
                 </div>
                 <div class="bg-zinc-900 rounded-3xl p-6 stock-card">
                     <div class="font-medium">BANK NIFTY</div>
-                    <div class="font-mono text-3xl mt-4">51,234</div>
-                    <div class="text-red-400 mt-2">-0.24%</div>
+                    <div class="font-mono text-3xl mt-4">—</div>
+                </div>
+                <div class="bg-zinc-900 rounded-3xl p-6 stock-card">
+                    <div class="font-medium">SENSEX</div>
+                    <div class="font-mono text-3xl mt-4">—</div>
                 </div>
             `;
         }
 
-        function updateLiveTicker() {
-            const items = Object.keys(priceCache).slice(0, 4).map(sym => {
-                const p = priceCache[sym];
-                return `\( {sym} ₹ \){p.price.toFixed(0)} \( {p.percent >= 0 ? '+' : ''} \){p.percent.toFixed(1)}%`;
-            });
-            let html = items.map(i => `<span class="mr-12">${i}</span>`).join('');
-            html += html;
-            document.getElementById('liveTicker').innerHTML = html || "AAPL ₹227 +1.2% • RELIANCE ₹2845 +1.6% • ...";
-        }
-
-        // ================== SYMBOL SWITCH & UI ==================
+        // ================== SYMBOL SWITCH ==================
         async function switchSymbol(symbol) {
             initTradingView(symbol);
-            
             const quote = priceCache[symbol] || await fetchQuote(symbol);
             if (quote) {
                 priceCache[symbol] = quote;
-                document.getElementById('mainPriceDisplay').textContent = quote.price.toFixed(2);
+                document.getElementById('mainPriceDisplay').textContent = quote.price;
                 const chEl = document.getElementById('mainChangeDisplay');
-                chEl.textContent = `\( {quote.percent >= 0 ? '+' : ''} \){quote.percent.toFixed(2)}%`;
-                chEl.className = `text-2xl font-medium ${quote.percent >= 0 ? 'price-up' : 'price-down'}`;
-            }
-            
-            // Re-subscribe via WS
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                subscribeToSymbols([symbol]);
-            }
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('twelveDataKeyInput').value.trim();
-            if (key) {
-                TWELVE_DATA_API_KEY = key;
-                localStorage.setItem('twelveDataKey', key);
-                document.getElementById('apiStatus').innerHTML = `
-                    <div class="w-2 h-2 bg-emerald-500 rounded-full live-dot"></div>
-                    <span class="text-emerald-400">Twelve Data WS Ready</span>
-                `;
-                connectWebSocket();
-                manualRefresh();
-                alert("API key saved! WebSocket connecting...");
+                const isUp = quote.percent >= 0;
+                chEl.textContent = `${isUp ? '+' : ''}${quote.percent}%`;
+                chEl.className = `text-2xl font-medium ${isUp ? 'price-up' : 'price-down'}`;
             }
         }
 
@@ -474,21 +349,22 @@
             fetchQuote(currentMainSymbol).then(q => {
                 if (q) {
                     priceCache[currentMainSymbol] = q;
-                    updatePriceInUI(currentMainSymbol, q);
+                    document.getElementById('mainPriceDisplay').textContent = q.price;
+                    const chEl = document.getElementById('mainChangeDisplay');
+                    const isUp = q.percent >= 0;
+                    chEl.textContent = `${isUp ? '+' : ''}${q.percent}%`;
+                    chEl.className = `text-2xl font-medium ${isUp ? 'price-up' : 'price-down'}`;
                 }
             });
         }
 
         function addToWatchlist() {
-            let sym = prompt("Enter symbol (e.g. RELIANCE, AAPL):");
+            let sym = prompt("Enter NSE Symbol (e.g. RELIANCE, SBIN, LT):");
             if (sym) {
                 sym = sym.trim().toUpperCase();
                 if (!watchlistSymbols.includes(sym)) {
                     watchlistSymbols.push(sym);
                     renderWatchlist();
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        subscribeToSymbols([sym]);
-                    }
                 }
             }
         }
@@ -504,18 +380,18 @@
             const el = document.getElementById('currentTime');
             setInterval(() => {
                 const now = new Date();
-                el.textContent = now.toLocaleString('en-IN', { 
-                    weekday: 'long', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-                }) + " IST • Twelve Data WebSocket";
+                el.textContent = now.toLocaleString('en-IN', {
+                    weekday: 'long', month: 'short', day: 'numeric', 
+                    hour: '2-digit', minute: '2-digit'
+                }) + " IST • Yahoo Finance";
             }, 15000);
         }
 
-        // Search support
+        // Search
         document.getElementById('searchInput').addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
                 let q = e.target.value.trim().toUpperCase();
                 if (q) {
-                    document.getElementById('symbolSelect').value = q;
                     await switchSymbol(q);
                     e.target.value = '';
                 }
@@ -524,38 +400,16 @@
 
         // ================== INITIALIZE ==================
         async function initializeDashboard() {
-            if (TWELVE_DATA_API_KEY) {
-                document.getElementById('twelveDataKeyInput').value = TWELVE_DATA_API_KEY;
-            }
-            
             renderIndices();
             updateTime();
-            createInitialTicker();
+            initTradingView("NIFTY");
             
-            initTradingView("AAPL");
-            
-            // Initial data load
             await renderWatchlist();
             await renderMovers();
-            
-            // Connect WebSocket if key exists
-            if (TWELVE_DATA_API_KEY) {
-                connectWebSocket();
-            }
-            
-            console.log("%c✅ MarketPulse with Twelve Data WebSocket is ready!\nReal-time price updates via WebSocket for subscribed symbols.", "color:#22c55e");
-        }
 
-        function createInitialTicker() {
-            document.getElementById('liveTicker').innerHTML = `
-                <span class="mr-12">AAPL ₹227.45 +1.23%</span>
-                <span class="mr-12">RELIANCE ₹2845.60 +1.61%</span>
-                <span class="mr-12">TSLA ₹412.80 +2.45%</span>
-            ` + `
-                <span class="mr-12">AAPL ₹227.45 +1.23%</span>
-                <span class="mr-12">RELIANCE ₹2845.60 +1.61%</span>
-                <span class="mr-12">TSLA ₹412.80 +2.45%</span>
-            `;
+            startLiveTicker();
+
+            console.log("%c✅ MarketPulse Ready! Live Ticker + TradingView Charts", "color:#22c55e");
         }
 
         window.onload = initializeDashboard;
