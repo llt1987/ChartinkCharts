@@ -90,24 +90,31 @@
     </nav>
 
     <div class="max-w-7xl mx-auto px-6 py-8">
-        <!-- Header with Title + Refresh + New Link -->
+        <!-- Header with Title + Buttons -->
         <div class="flex justify-between items-center mb-10">
             <div>
                 <h1 class="text-4xl font-bold tracking-tighter mb-1">Live Indian Market Overview</h1>
                 <p class="text-zinc-400" id="currentTime">Loading...</p>
             </div>
             
-            <div class="flex items-center gap-4">
-                <!-- Refresh Button (moved here) -->
+            <div class="flex flex-col items-end gap-3">
+                <!-- Refresh Button -->
                 <button onclick="manualRefresh()" 
                         class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-3xl text-sm font-medium">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
                 
-                <!-- New Table / Link to accumulation.html -->
+                <!-- Accumulation Link -->
                 <a href="accumulation.html" 
-                   class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-3xl text-sm font-medium text-white transition-colors">
+                   class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-3xl text-sm font-medium text-white transition-colors w-full justify-center">
                     <i class="fas fa-table"></i> Accumulation
+                </a>
+                
+                <!-- New Blog Link -->
+                <a href="https://aaravtomar.blogspot.com/" 
+                   target="_blank"
+                   class="flex items-center gap-2 bg-zinc-700 hover:bg-zinc-600 px-6 py-3 rounded-3xl text-sm font-medium text-white transition-colors w-full justify-center">
+                    <i class="fas fa-blog"></i> Blog
                 </a>
             </div>
         </div>
